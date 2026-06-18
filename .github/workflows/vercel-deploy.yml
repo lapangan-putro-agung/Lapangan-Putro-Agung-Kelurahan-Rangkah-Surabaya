@@ -12,10 +12,11 @@ jobs:
       repository-projects: write
     steps:
       - uses: actions/checkout@v4
-      - uses: amondnet/vercel-action@v20
+      - uses: amondnet/vercel-action@v42
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-deployment: true
           vercel-args: '--prod'
           vercel-org-id: ${{ secrets.ORG_ID }}
           vercel-project-id: ${{ secrets.PROJECT_ID }}
