@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,23 @@ import { useToast } from "@/hooks/use-toast";
 const ResetPassword = () => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [sessionReady, setSessionReady] = useState(false);
 
     const navigate = useNavigate();
     const { toast } = useToast();
 
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === "PASSWORD_RECOVERY") {
+                setSessionReady(true);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
     const handleResetPassword = async () => {
-        if (password.length < 6)
-        {
+        if (password.length < 6) {
             toast({
                 title: "Password terlalu pendek",
                 description: "Password minimal 6 karakter.",
@@ -25,26 +35,21 @@ const ResetPassword = () => {
 
         setLoading(true);
 
-        const { error } = await supabase.auth.updateUser({
-            password,
-        });
+        const { error } = await supabase.auth.updateUser({ password });
 
         setLoading(false);
 
-        if (error)
-        {
+        if (error) {
             toast({
                 title: "Gagal mengubah password",
                 description: error.message,
                 variant: "destructive",
             });
-        } else
-        {
+        } else {
             toast({
                 title: "Berhasil",
                 description: "Password berhasil diperbarui.",
             });
-
             navigate("/auth");
         }
     };
@@ -52,25 +57,29 @@ const ResetPassword = () => {
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <div className="bg-card border rounded-xl p-8 w-full max-w-md space-y-4">
-                <h1 className="text-2xl font-bold text-center">
-                    Reset Password
-                </h1>
-
+                <h1 className="text-2xl font-bold text-center">Reset Password</h1>
                 <p className="text-sm text-muted-foreground text-center">
                     Masukkan password baru Anda.
                 </p>
+
+                {!sessionReady && (
+                    <p className="text-sm text-yellow-500 text-center">
+                        Memverifikasi link reset password...
+                    </p>
+                )}
 
                 <Input
                     type="password"
                     placeholder="Password Baru"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={!sessionReady}
                 />
 
                 <Button
                     className="w-full"
                     onClick={handleResetPassword}
-                    disabled={loading}
+                    disabled={loading || !sessionReady}
                 >
                     {loading ? "Menyimpan..." : "Simpan Password Baru"}
                 </Button>
