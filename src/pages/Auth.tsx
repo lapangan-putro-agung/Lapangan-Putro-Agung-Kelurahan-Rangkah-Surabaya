@@ -165,10 +165,6 @@ const Auth = () => {
           <Button variant="hero" className="w-full" type="submit" disabled={submitting}>
             {submitting ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
           </Button>
-
-          <Button variant="hero" className="w-full" type="submit" disabled={submitting}>
-            {submitting ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
-          </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-4">
