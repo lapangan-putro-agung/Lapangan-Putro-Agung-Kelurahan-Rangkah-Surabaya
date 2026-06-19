@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, X, ChevronRight, ChevronLeft as ChevronPrev, ImageIcon } from "lucide-react";
@@ -55,9 +55,9 @@ const Gallery = () => {
   }, [courtId]);
 
   const openLightbox = (index: number) => setLightboxIndex(index);
-  const closeLightbox = () => setLightboxIndex(null);
-  const goNext = () => setLightboxIndex((prev) => (prev !== null && prev < images.length - 1 ? prev + 1 : prev));
-  const goPrev = () => setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : prev));
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const goNext = useCallback(() => setLightboxIndex((prev) => (prev !== null && prev < images.length - 1 ? prev + 1 : prev)), [images.length]);
+  const goPrev = useCallback(() => setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : prev)), []);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -68,7 +68,7 @@ const Gallery = () => {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [lightboxIndex, images.length]);
+  }, [lightboxIndex, closeLightbox, goNext, goPrev]);
 
   if (!court) {
     return (

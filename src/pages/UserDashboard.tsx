@@ -17,39 +17,52 @@ const COURT_LABELS: Record<string, string> = {
   soccer: "⚽ Mini Soccer",
 };
 
+interface BookingRow {
+  id: string;
+  user_id: string;
+  court_id: string;
+  booking_date: string;
+  time_slot: string;
+  amount: number;
+  payment_status: string;
+  created_at: string;
+}
+
 const UserDashboard = () => {
   const { user, profile, loading } = useAuth();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [fetching, setFetching] = useState(true);
-  const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<BookingRow | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!user) return;
+    setFetching(true);
     supabase
       .from("bookings")
       .select("*")
       .eq("user_id", user.id)
       .order("booking_date", { ascending: false })
       .then(({ data }) => {
-        setBookings(data || []);
+        setBookings((data as BookingRow[]) || []);
         setFetching(false);
-
-        // If redirected from payment, show the booking receipt
-        const paymentStatus = searchParams.get("payment");
-        const bookingId = searchParams.get("booking");
-        if (paymentStatus === "success" && bookingId && data) {
-          const found = data.find((b: any) => b.id === bookingId);
-          if (found) {
-            setSelectedBooking(found);
-            toast({ title: "Pembayaran diproses!", description: "Nota booking kamu sudah tersedia." });
-          }
-          // Clean up URL params
-          setSearchParams({}, { replace: true });
-        }
       });
   }, [user]);
+
+  useEffect(() => {
+    if (bookings.length === 0) return;
+    const paymentStatus = searchParams.get("payment");
+    const bookingId = searchParams.get("booking");
+    if (paymentStatus === "success" && bookingId) {
+      const found = bookings.find((b) => b.id === bookingId);
+      if (found) {
+        setSelectedBooking(found);
+        toast({ title: "Pembayaran diproses!", description: "Nota booking kamu sudah tersedia." });
+      }
+      setSearchParams({}, { replace: true });
+    }
+  }, [bookings, searchParams, setSearchParams, toast]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-background"><p>Loading...</p></div>;
   if (!user) return <Navigate to="/auth" replace />;

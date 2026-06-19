@@ -244,6 +244,23 @@ const AdminDashboard = () => {
   );
 };
 
+interface CourtStat {
+  id: string;
+  label: string;
+  total: number;
+  paid: number;
+  revenue: number;
+}
+
+interface OverviewTabProps {
+  bookings: BookingRow[];
+  totalRevenue: number;
+  paidCount: number;
+  pendingCount: number;
+  courtStats: CourtStat[];
+  fetching: boolean;
+}
+
 /* ===================== OVERVIEW TAB ===================== */
 function OverviewTab({
   bookings,
@@ -252,7 +269,7 @@ function OverviewTab({
   pendingCount,
   courtStats,
   fetching,
-}: any) {
+}: OverviewTabProps) {
   const stats = [
     { icon: Users, label: "Total Booking", value: bookings.length, color: "text-primary" },
     { icon: CheckCircle, label: "Lunas", value: paidCount, color: "text-green-600" },
@@ -288,7 +305,7 @@ function OverviewTab({
 
       <h3 className="text-lg font-heading tracking-wider text-foreground mb-4">STATISTIK PER LAPANGAN</h3>
       <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
-        {courtStats.map((c: any) => (
+        {courtStats.map((c: CourtStat) => (
           <div key={c.id} className="bg-card rounded-xl border border-border p-4 sm:p-5 shadow-sm">
             <p className="text-base sm:text-lg font-semibold mb-3">{c.label}</p>
             <div className="space-y-2 text-sm">
@@ -380,6 +397,16 @@ function OverviewTab({
   );
 }
 
+interface BookingsTabProps {
+  filtered: BookingRow[];
+  filterCourt: string;
+  setFilterCourt: (val: string) => void;
+  filterPayment: string;
+  setFilterPayment: (val: string) => void;
+  fetching: boolean;
+  updatePaymentStatus: (id: string, status: string) => Promise<void>;
+}
+
 /* ===================== BOOKINGS TAB ===================== */
 function BookingsTab({
   filtered,
@@ -389,7 +416,7 @@ function BookingsTab({
   setFilterPayment,
   fetching,
   updatePaymentStatus,
-}: any) {
+}: BookingsTabProps) {
   return (
     <div>
       <h2 className="text-2xl sm:text-3xl font-heading tracking-wider text-foreground mb-6">DAFTAR BOOKING</h2>
@@ -503,8 +530,15 @@ function BookingsTab({
   );
 }
 
+interface RevenueTabProps {
+  bookings: BookingRow[];
+  courtStats: CourtStat[];
+  paidRevenue: number;
+  pendingRevenue: number;
+}
+
 /* ===================== REVENUE TAB ===================== */
-function RevenueTab({ bookings, courtStats, paidRevenue, pendingRevenue }: any) {
+function RevenueTab({ bookings, courtStats, paidRevenue, pendingRevenue }: RevenueTabProps) {
   const totalRevenue = paidRevenue + pendingRevenue;
 
   const monthlyData = useMemo(() => {
@@ -542,7 +576,7 @@ function RevenueTab({ bookings, courtStats, paidRevenue, pendingRevenue }: any) 
 
       <h3 className="text-lg font-heading tracking-wider text-foreground mb-4">PENDAPATAN PER LAPANGAN</h3>
       <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
-        {courtStats.map((c: any) => {
+        {courtStats.map((c: CourtStat) => {
           const pct = totalRevenue > 0 ? Math.round((c.revenue / totalRevenue) * 100) : 0;
           return (
             <div key={c.id} className="bg-card rounded-xl border border-border p-4 sm:p-5 shadow-sm">
@@ -563,7 +597,7 @@ function RevenueTab({ bookings, courtStats, paidRevenue, pendingRevenue }: any) 
         {monthlyData.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">Belum ada data</p>
         ) : (
-          monthlyData.map(([month, data]: any) => (
+          monthlyData.map(([month, data]: [string, { paid: number; pending: number }]) => (
             <div key={month} className="bg-card rounded-xl border border-border p-4 shadow-sm">
               <p className="font-semibold mb-2">{format(new Date(month + "-01"), "MMMM yyyy", { locale: idLocale })}</p>
               <div className="flex justify-between text-sm">
@@ -597,7 +631,7 @@ function RevenueTab({ bookings, courtStats, paidRevenue, pendingRevenue }: any) 
             {monthlyData.length === 0 ? (
               <tr><td colSpan={4} className="p-8 text-center text-muted-foreground">Belum ada data</td></tr>
             ) : (
-              monthlyData.map(([month, data]: any) => (
+              monthlyData.map(([month, data]: [string, { paid: number; pending: number }]) => (
                 <tr key={month} className="border-b border-border/50 hover:bg-muted/30">
                   <td className="p-4 font-medium">{format(new Date(month + "-01"), "MMMM yyyy", { locale: idLocale })}</td>
                   <td className="p-4 text-green-600 font-semibold">Rp {data.paid.toLocaleString("id-ID")}</td>
