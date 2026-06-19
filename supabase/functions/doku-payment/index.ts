@@ -38,12 +38,23 @@ async function generateSignature(
   return `HMACSHA256=${btoa(String.fromCharCode(...new Uint8Array(signature)))}`;
 }
 
+interface DokuResponse {
+  response?: {
+    payment?: {
+      url?: string;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
 async function callDokuWithRetry(
   url: string,
   headers: Record<string, string>,
   body: string,
   attempt = 1
-): Promise<any> {
+): Promise<DokuResponse> {
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -74,12 +85,13 @@ async function callDokuWithRetry(
     }
 
     return await response.json();
-  } catch (error: any) {
-    if (error.message?.includes("DOKU error [4")) throw error;
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    if (err.message.includes("DOKU error [4")) throw err;
 
-    console.error(`DOKU attempt ${attempt}/3 failed:`, error.message);
+    console.error(`DOKU attempt ${attempt}/3 failed:`, err.message);
     if (attempt >= 3) {
-      throw new Error(`DOKU unavailable after 3 attempts: ${error.message}`);
+      throw new Error(`DOKU unavailable after 3 attempts: ${err.message}`);
     }
 
     await new Promise((r) => setTimeout(r, 2000 * Math.pow(2, attempt - 1)));

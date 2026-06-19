@@ -71,7 +71,7 @@ const Booking = () => {
 
       const slots: Record<string, Set<string>> = {};
       const counts: Record<string, number> = {};
-      (data || []).forEach((b: any) => {
+      (data || []).forEach((b: { court_id: string; time_slot: string }) => {
         if (!slots[b.court_id]) slots[b.court_id] = new Set();
         slots[b.court_id].add(b.time_slot);
         counts[b.court_id] = (counts[b.court_id] || 0) + 1;
@@ -153,11 +153,11 @@ const Booking = () => {
       {
         throw new Error("Tidak mendapatkan URL pembayaran dari DOKU");
       }
-    } catch (err: any)
-    {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Terjadi kesalahan saat memproses pembayaran";
       toast({
         title: "Pembayaran gagal",
-        description: err.message || "Terjadi kesalahan saat memproses pembayaran",
+        description: message,
         variant: "destructive",
       });
     } finally

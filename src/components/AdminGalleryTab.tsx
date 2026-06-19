@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Trash2, ImageIcon, Loader2, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ const AdminGalleryTab = () => {
   const [caption, setCaption] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from("gallery_images")
@@ -40,11 +40,11 @@ const AdminGalleryTab = () => {
       .order("created_at", { ascending: false });
     setImages((data as GalleryImage[]) || []);
     setLoading(false);
-  };
+  }, [selectedCourt]);
 
   useEffect(() => {
     fetchImages();
-  }, [selectedCourt]);
+  }, [fetchImages]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -75,8 +75,9 @@ const AdminGalleryTab = () => {
 
         if (insertError) throw insertError;
         successCount++;
-      } catch (err: any) {
-        toast({ title: "Upload gagal", description: err.message, variant: "destructive" });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Terjadi kesalahan";
+        toast({ title: "Upload gagal", description: message, variant: "destructive" });
       }
     }
 
@@ -105,8 +106,9 @@ const AdminGalleryTab = () => {
 
       setImages((prev) => prev.filter((i) => i.id !== img.id));
       toast({ title: "Foto berhasil dihapus" });
-    } catch (err: any) {
-      toast({ title: "Gagal menghapus", description: err.message, variant: "destructive" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Terjadi kesalahan";
+      toast({ title: "Gagal menghapus", description: message, variant: "destructive" });
     }
     setDeletingId(null);
   };

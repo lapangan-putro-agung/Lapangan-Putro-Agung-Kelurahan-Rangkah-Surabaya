@@ -25,7 +25,7 @@ export function useChat(userId: string | undefined, role: "user" | "admin") {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     if (!userId) return;
     if (role === "user") {
       const { data } = await supabase
@@ -59,13 +59,13 @@ export function useChat(userId: string | undefined, role: "user" | "admin") {
       }
     }
     setLoading(false);
-  };
+  }, [userId, role]);
 
   // Fetch conversations
   useEffect(() => {
     if (!userId) return;
     fetchConversations();
-  }, [userId, role]);
+  }, [userId, fetchConversations]);
 
   // Realtime: listen for new/updated conversations (admin sees new users)
   useEffect(() => {
@@ -81,7 +81,7 @@ export function useChat(userId: string | undefined, role: "user" | "admin") {
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [userId, role]);
+  }, [userId, fetchConversations]);
 
   // Fetch messages for active conversation
   useEffect(() => {
