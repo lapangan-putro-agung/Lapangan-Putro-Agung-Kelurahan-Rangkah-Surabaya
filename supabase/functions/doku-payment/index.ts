@@ -183,7 +183,7 @@ serve(async (req) => {
     const payment_url: string = dokuData.response?.payment?.url;
     await supabase
       .from("bookings")
-      .update({ payment_url: payment_url, payment_status: "waiting_payment" })
+      .update({ payment_url: payment_url, payment_status: "pending" })
       .eq("id", bookingId);
 
     return new Response(

@@ -202,13 +202,22 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-3 sm:p-6 lg:p-8">
+        {/* Mobile top bar */}
+        <div className="lg:hidden flex items-center gap-3 mb-4 pb-3 border-b border-border">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors"
+            aria-label="Buka menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <h1 className="text-base font-heading tracking-wider text-foreground">ADMIN PANEL</h1>
+        </div>
         <div className="max-w-7xl mx-auto">
           {activeTab === "overview" && (
             <OverviewTab
               bookings={bookings}
               totalRevenue={totalRevenue}
-              paidRevenue={paidRevenue}
-              pendingRevenue={pendingRevenue}
               paidCount={paidCount}
               pendingCount={pendingCount}
               courtStats={courtStats}
