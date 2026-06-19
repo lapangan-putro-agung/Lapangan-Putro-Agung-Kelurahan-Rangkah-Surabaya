@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LogIn, LogOut, LayoutDashboard, Shield, MessageCircle, Camera } from "lucide-react";
+import { Menu, X, LogIn, LogOut, LayoutDashboard, Shield, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadChatCount } from "@/hooks/useUnreadChatCount";
@@ -14,11 +14,20 @@ const Navbar = () => {
   const adminUnread = useUnreadChatCount("admin", isAdmin ? user?.id : undefined);
 
   const navItems = [
-    { label: "Beranda", href: "/" },
-    { label: "Lapangan", href: "/#lapangan" },
-    { label: "Booking", href: "/booking" },
-    { label: "SOP", href: "/#sop" },
+    { label: "Beranda", href: "/", isAnchor: false },
+    { label: "Lapangan", href: "lapangan", isAnchor: true },
+    { label: "Booking", href: "/booking", isAnchor: false },
+    { label: "SOP", href: "sop", isAnchor: true },
   ];
+
+  const handleAnchorClick = (anchor: string, closeMobile = false) => {
+    if (closeMobile) setIsOpen(false);
+    if (window.location.pathname !== "/") {
+      window.location.href = "/#" + anchor;
+    } else {
+      document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-md border-b border-green-light/20">
@@ -30,15 +39,25 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-secondary transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              item.isAnchor ? (
+                <button
+                  key={item.label}
+                  onClick={() => handleAnchorClick(item.href)}
+                  className="px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-secondary transition-colors"
+                >
+                  {item.label}
+                </button>
+              ) : (
+                <Link
+                  key={item.label}
+                  to={item.href}
+                  className="px-4 py-2 text-sm font-medium text-primary-foreground/80 hover:text-secondary transition-colors"
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
 
             {user ? (
               <>
@@ -93,16 +112,26 @@ const Navbar = () => {
             className="md:hidden overflow-hidden bg-primary border-t border-green-light/20"
           >
             <div className="px-4 py-4 flex flex-col gap-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="px-4 py-3 text-sm font-medium text-primary-foreground/80 hover:text-secondary rounded-lg hover:bg-green-light/10 transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {navItems.map((item) =>
+                item.isAnchor ? (
+                  <button
+                    key={item.label}
+                    onClick={() => handleAnchorClick(item.href, true)}
+                    className="px-4 py-3 text-sm font-medium text-primary-foreground/80 hover:text-secondary rounded-lg hover:bg-green-light/10 transition-colors text-left"
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  <Link
+                    key={item.label}
+                    to={item.href}
+                    className="px-4 py-3 text-sm font-medium text-primary-foreground/80 hover:text-secondary rounded-lg hover:bg-green-light/10 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
               {user ? (
                 <>
                   {isAdmin && (
