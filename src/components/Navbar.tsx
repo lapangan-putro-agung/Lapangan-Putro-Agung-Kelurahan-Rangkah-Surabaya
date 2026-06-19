@@ -4,7 +4,7 @@ import { Menu, X, LogIn, LogOut, LayoutDashboard, Shield, MessageCircle } from "
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadChatCount } from "@/hooks/useUnreadChatCount";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "@/assets/logo-persebaya.png";
 
 const Navbar = () => {
@@ -12,6 +12,8 @@ const Navbar = () => {
   const { user, isAdmin, profile, signOut } = useAuth();
   const userUnread = useUnreadChatCount("user", !isAdmin ? user?.id : undefined);
   const adminUnread = useUnreadChatCount("admin", isAdmin ? user?.id : undefined);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
     { label: "Beranda", href: "/", isAnchor: false },
@@ -22,8 +24,11 @@ const Navbar = () => {
 
   const handleAnchorClick = (anchor: string, closeMobile = false) => {
     if (closeMobile) setIsOpen(false);
-    if (window.location.pathname !== "/") {
-      window.location.href = "/#" + anchor;
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } else {
       document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth" });
     }
