@@ -13,6 +13,7 @@ import UserDashboard from "./pages/UserDashboard";
 import Chat from "./pages/Chat";
 import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/galeri/:courtId" element={<Gallery />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

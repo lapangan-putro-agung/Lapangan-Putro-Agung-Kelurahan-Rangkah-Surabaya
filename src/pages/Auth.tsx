@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-persebaya.png";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -25,19 +26,26 @@ const Auth = () => {
     if (!isLogin && !fullName.trim()) return;
 
     setSubmitting(true);
-    try {
-      if (isLogin) {
+    try
+    {
+      if (isLogin)
+      {
         const { error } = await signIn(email, password);
-        if (error) {
+        if (error)
+        {
           toast({ title: "Login gagal", description: error.message, variant: "destructive" });
-        } else {
+        } else
+        {
           navigate("/");
         }
-      } else {
+      } else
+      {
         const { error } = await signUp(email, password, fullName);
-        if (error) {
+        if (error)
+        {
           toast({ title: "Registrasi gagal", description: error.message, variant: "destructive" });
-        } else {
+        } else
+        {
           toast({
             title: "Registrasi berhasil!",
             description: "Silakan cek email untuk verifikasi akun Anda.",
@@ -45,8 +53,39 @@ const Auth = () => {
           setIsLogin(true);
         }
       }
-    } finally {
+    } finally
+    {
       setSubmitting(false);
+    }
+  };
+  const handleForgotPassword = async () => {
+    if (!email.trim())
+    {
+      toast({
+        title: "Email diperlukan",
+        description: "Masukkan email terlebih dahulu.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error)
+    {
+      toast({
+        title: "Gagal mengirim email",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else
+    {
+      toast({
+        title: "Email terkirim",
+        description: "Silakan cek email untuk reset password.",
+      });
     }
   };
 
@@ -110,6 +149,22 @@ const Auth = () => {
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
+
+          {isLogin && (
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-sm text-accent hover:underline"
+              >
+                Lupa Password?
+              </button>
+            </div>
+          )}
+
+          <Button variant="hero" className="w-full" type="submit" disabled={submitting}>
+            {submitting ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}
+          </Button>
 
           <Button variant="hero" className="w-full" type="submit" disabled={submitting}>
             {submitting ? "Memproses..." : isLogin ? "Masuk" : "Daftar"}

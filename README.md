@@ -22,7 +22,8 @@ npm run dev
 * Lakukan perubahan.
 * Commit perubahan tersebut.
 
-### Menggunakan GitHub Codespaces
+### Menggunakan GitH
+ub Codespaces
 
 * Buka halaman utama repository GitHub.
 * Klik tombol Code (tombol hijau) di kanan atas.

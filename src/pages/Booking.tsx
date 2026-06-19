@@ -92,7 +92,8 @@ const Booking = () => {
   };
 
   const handleBooking = (courtId: string) => {
-    if (!user) {
+    if (!user)
+    {
       toast({ title: "Login dulu", description: "Silakan login untuk melakukan booking.", variant: "destructive" });
       navigate("/auth");
       return;
@@ -106,7 +107,8 @@ const Booking = () => {
     if (!user || !selectedCourtId || !selectedTime) return;
     setSubmitting(true);
 
-    try {
+    try
+    {
       // 1. Create booking record first
       const { data: booking, error: bookingError } = await supabase
         .from("bookings")
@@ -121,7 +123,8 @@ const Booking = () => {
         .select()
         .single();
 
-      if (bookingError || !booking) {
+      if (bookingError || !booking)
+      {
         throw new Error(bookingError?.message || "Gagal membuat booking");
       }
 
@@ -137,23 +140,28 @@ const Booking = () => {
         },
       });
 
-      if (paymentError) {
+      if (paymentError)
+      {
         throw new Error(paymentError.message || "Gagal memproses pembayaran");
       }
 
-      if (paymentData?.payment_url) {
+      if (paymentData?.payment_url)
+      {
         // Redirect to DOKU checkout page
         window.location.href = paymentData.payment_url;
-      } else {
+      } else
+      {
         throw new Error("Tidak mendapatkan URL pembayaran dari DOKU");
       }
-    } catch (err: any) {
+    } catch (err: any)
+    {
       toast({
         title: "Pembayaran gagal",
         description: err.message || "Terjadi kesalahan saat memproses pembayaran",
         variant: "destructive",
       });
-    } finally {
+    } finally
+    {
       setSubmitting(false);
     }
   };
