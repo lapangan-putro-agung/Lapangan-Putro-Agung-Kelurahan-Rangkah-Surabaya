@@ -72,7 +72,7 @@ const Navbar = () => {
                   </Link>
                 )}
                 <Link to="/dashboard" className="px-3 py-2 text-sm font-medium text-primary-foreground/80 hover:text-secondary transition-colors flex items-center gap-1">
-                  <LayoutDashboard className="w-3 h-3" /> Dashboard
+                  <LayoutDashboard className="w-3 h-3" /> Riwayat Pemesanan
                 </Link>
                 {!isAdmin && (
                   <Link to="/chat" className="px-3 py-2 text-sm font-medium text-primary-foreground/80 hover:text-secondary transition-colors flex items-center gap-1 relative">
@@ -145,7 +145,7 @@ const Navbar = () => {
                     </Link>
                   )}
                   <Link to="/dashboard" className="px-4 py-3 text-sm font-medium text-primary-foreground/80" onClick={() => setIsOpen(false)}>
-                    <LayoutDashboard className="w-3 h-3 inline mr-1" /> Dashboard
+                    <LayoutDashboard className="w-3 h-3 inline mr-1" /> Riwayat Pemesanan
                   </Link>
                   {!isAdmin && (
                     <Link to="/chat" className="px-4 py-3 text-sm font-medium text-primary-foreground/80 flex items-center gap-1" onClick={() => setIsOpen(false)}>
